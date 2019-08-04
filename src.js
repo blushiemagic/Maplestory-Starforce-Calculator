@@ -80,16 +80,20 @@ function getSuccessRate(args, star) {
     return success;
 }
 
-function calculateRange(from, to, results) {
+function calculateRange(args, from, to, results) {
     var result = {
         price: 0,
         destroys: 0,
         noDestroyChance: 1
     };
+    var skipEvent = (args.event & events.extra) > 0;
     for (var k = from; k < to; k++) {
         result.price += results[k].price;
         result.destroys += results[k].destroys;
         result.noDestroyChance *= results[k].noDestroyChance;
+        if (skipEvent && k <= 10) {
+            k++;
+        }
     }
     return result;
 }
@@ -97,7 +101,17 @@ function calculateRange(from, to, results) {
 function calculateStep(args, star, results) {
     var price = getPrice(args, star);
     var success = getSuccessRate(args, star);
+    var skipEvent = (args.event & events.extra) > 0;
     var step = {};
+    
+    //special case: at 11 stars and 10 star success gives extra
+    if (skipEvent && star === 11) {
+        step.price = price + (1 - success) * results[star - 1].price;
+        step.destroys = 0;
+        step.noDestroyChance = 1;
+        results[star] = step;
+        return step;
+    }
 
     //calculate cost of failure
     //given: already 1 failure
@@ -113,7 +127,7 @@ function calculateStep(args, star, results) {
             noDestroyChance: 0
         };
         if (star > destroyStar) {
-            var range = calculateRange(destroyStar, star, results);
+            var range = calculateRange(args, destroyStar, star, results);
             entry.price += range.price;
             entry.destroys += range.destroys;
         }
@@ -144,7 +158,7 @@ function calculateStep(args, star, results) {
                     noDestroyChance: 0
                 };
                 if (star > destroyStar) {
-                    var range = calculateRange(destroyStar, star, results);
+                    var range = calculateRange(args, destroyStar, star, results);
                     entry.price += range.price;
                     entry.destroys += range.destroys;
                 }
@@ -152,12 +166,21 @@ function calculateStep(args, star, results) {
                 remainingRate -= entry.weight;
             }
             //scenario: drop a second time and activate chance time
-            entry = {
-                weight: remainingRate,
-                price: getPrice(args, star - 2) + dropPrice + price + results[star - 1].price,
-                destroys: results[star - 1].destroys,
-                noDestroyChance: results[star - 1].noDestroyChance
-            };
+            if (skipEvent && star - 2 <= 10) {
+                entry = {
+                    weight: remainingRate,
+                    price: getPrice(args, star - 2) + dropPrice + price,
+                    destroys: 0,
+                    noDestroyChance: 1
+                };
+            } else {
+                entry = {
+                    weight: remainingRate,
+                    price: getPrice(args, star - 2) + dropPrice + price + results[star - 1].price,
+                    destroys: results[star - 1].destroys,
+                    noDestroyChance: results[star - 1].noDestroyChance
+                };
+            }
             failureTable.push(entry);
             remainingRate -= entry.weight;
         } else {
@@ -182,8 +205,6 @@ function calculateStep(args, star, results) {
         failureTable.push(entry);
         remainingRate -= entry.weight;
     }
-    console.log(star);
-    console.log(failureTable);
     var failurePrice = 0;
     var failureDestroys = 0;
     var destroyChance = 0;
@@ -217,7 +238,7 @@ function calculate() {
     for (var k = 0; k < to; k++) {
         calculateStep(args, k, results);
     }
-    var result = calculateRange(from, to, results);
+    var result = calculateRange(args, from, to, results);
     var resultDiv = document.getElementById('results');
     resultDiv.innerHTML = '';
     var div = document.createElement('div');
