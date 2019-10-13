@@ -58,6 +58,7 @@ function getPrice(args, star) {
     } else {
         base += Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 100;
     }
+    base = Math.round(base / 100) * 100;
     var multiplier = args.mvpDiscount;
     if ((args.event & events.discount) > 0) {
         multiplier *= 0.7;
@@ -65,8 +66,7 @@ function getPrice(args, star) {
     if (args.safeguard && data[star].safeguard) {
         multiplier += 1;
     }
-    var price = base * multiplier;
-    return Math.round(price / 100) * 100;
+    return base * multiplier;
 }
 
 function getSuccessRate(args, star) {
