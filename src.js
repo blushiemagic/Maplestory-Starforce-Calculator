@@ -59,7 +59,10 @@ function getPrice(args, star) {
         base += Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 100;
     }
     base = Math.round(base / 100) * 100;
-    var multiplier = args.mvpDiscount;
+    var multiplier = 1;
+    if (star < 17) {
+        multiplier = args.mvpDiscount;
+    }
     if ((args.event & events.discount) > 0) {
         multiplier *= 0.7;
     }
