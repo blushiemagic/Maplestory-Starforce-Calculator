@@ -66,7 +66,7 @@ function getPrice(args, star) {
     if ((args.event & events.discount) > 0) {
         multiplier *= 0.7;
     }
-    if (args.safeguard && data[star].safeguard) {
+    if (args.safeguard && data[star].safeguard && canDestroy(args, star)) {
         multiplier += 1;
     }
     return base * multiplier;
@@ -81,6 +81,14 @@ function getSuccessRate(args, star) {
         success = 1;
     }
     return success;
+}
+
+function canDestroy(args, star) {
+    var result = data[star].destroy && data[star].destroy > 0;
+    if ((args.event & events.guarantee) > 0 && (star == 5 || star == 10 || star == 15)) {
+        result = false;
+    }
+    return result;
 }
 
 function calculateRange(args, from, to, results) {
@@ -121,7 +129,7 @@ function calculateStep(args, star, results) {
     var failureTable = [];
     var remainingRate = 1;
     var entry;
-    if (data[star].destroy && !(args.safeguard && data[star].safeguard)) {
+    if (canDestroy(args, star) && !(args.safeguard && data[star].safeguard)) {
         //scenario: failure is a destroy
         entry = {
             weight: remainingRate * data[star].destroy,
@@ -152,7 +160,7 @@ function calculateStep(args, star, results) {
             };
             failureTable.push(entry);
             remainingRate -= entry.weight;
-            if (data[star - 1].destroy && !(args.safeguard && data[star - 1].safeguard)) {
+            if (canDestroy(args, star - 1) && !(args.safeguard && data[star - 1].safeguard)) {
                 //scenario: destroy right after failing
                 entry = {
                     weight: remainingRate * data[star - 1].destroy,
@@ -231,6 +239,7 @@ function calculateStep(args, star, results) {
 function calculate() {
     var args = {};
     args.event = events[document.getElementById('event').value];
+    args.eventSafeguard = document.getElementById('event-safeguard').checked;
     args.mvpDiscount = mvp[document.getElementById('mvp').value];
     args.level = parseInt(document.getElementById('level').value);
     var from = parseInt(document.getElementById('from').value);
