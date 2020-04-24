@@ -88,6 +88,9 @@ function canDestroy(args, star) {
     if ((args.event & events.guarantee) > 0 && (star == 5 || star == 10 || star == 15)) {
         result = false;
     }
+    if (args.eventSafeguard && star < 15) {
+        result = false
+    }
     return result;
 }
 
