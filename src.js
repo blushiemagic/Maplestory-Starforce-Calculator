@@ -233,7 +233,8 @@ function calculateStep(args, star, results) {
     var numFailures = (1 - success) / success;
     step.price = price + failurePrice * numFailures;
     step.destroys = failureDestroys * numFailures;
-    step.noDestroyChance = Math.pow(1 - destroyChance, numFailures);
+    //step.noDestroyChance = Math.pow(1 - destroyChance, numFailures);
+    step.noDestroyChance = success / (success + destroyChance - success * destroyChance);
 
     results[star] = step;
     return step;
