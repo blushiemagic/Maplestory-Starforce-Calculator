@@ -75,7 +75,7 @@ function getPrice(args, star) {
 function getSuccessRate(args, star) {
     var success = data[star].success;
     if (args.catcher) {
-        success *= 1.045;
+        success *= 1.05;
     }
     if ((args.event & events.guarantee) > 0 && (star === 5 || star === 10 || star === 15)) {
         success = 1;
