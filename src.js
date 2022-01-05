@@ -4,7 +4,8 @@ const events = {
     none: 0,
     discount: 1,
     guarantee: 2,
-    extra: 4
+    extra: 4,
+    shining: 3
 }
 
 const mvp = {
