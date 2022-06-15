@@ -47,19 +47,23 @@ const data = {
 
 function getPrice(args, star) {
     var level = Math.floor(args.level / 10) * 10;
-    var base = 1000;
+    var base;
     if (star < 10) {
-        base += Math.pow(level, 3) * (star + 1) / 25;
+        base = Math.pow(level, 3) * (star + 1) / 2500;
     } else if (star < 15) {
-        base += Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 400;
+        base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 40000;
     } else if (star < 18) {
-        base += Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 120;
+        base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 12000;
     } else if (star < 20) {
-        base += Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 110;
+        base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 11000;
     } else {
-        base += Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 100;
+        base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 10000;
     }
-    base = Math.round(base / 100) * 100;
+    base = Math.round(base) + 10;
+    if (star >= 15) {
+        base = Math.round(0.78 * base);
+    }
+    base *= 100;
     var multiplier = 1;
     if (star < 17) {
         multiplier = args.mvpDiscount;
