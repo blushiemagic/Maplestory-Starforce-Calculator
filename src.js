@@ -71,7 +71,7 @@ function getPrice(args, star) {
     if ((args.event & events.discount) > 0) {
         multiplier *= 0.7;
     }
-    if (args.safeguard && data[star].safeguard && canDestroy(args, star)) {
+    if (args.safeguard[star] && data[star].safeguard && canDestroy(args, star)) {
         multiplier += 1;
     }
     return base * multiplier;
@@ -137,7 +137,7 @@ function calculateStep(args, star, results) {
     var failureTable = [];
     var remainingRate = 1;
     var entry;
-    if (canDestroy(args, star) && !(args.safeguard && data[star].safeguard)) {
+    if (canDestroy(args, star) && !(args.safeguard[star] && data[star].safeguard)) {
         //scenario: failure is a destroy
         entry = {
             weight: remainingRate * data[star].destroy,
@@ -168,7 +168,7 @@ function calculateStep(args, star, results) {
             };
             failureTable.push(entry);
             remainingRate -= entry.weight;
-            if (canDestroy(args, star - 1) && !(args.safeguard && data[star - 1].safeguard)) {
+            if (canDestroy(args, star - 1) && !(args.safeguard[star - 1] && data[star - 1].safeguard)) {
                 //scenario: destroy right after failing
                 entry = {
                     weight: remainingRate * data[star - 1].destroy,
@@ -246,29 +246,54 @@ function calculateStep(args, star, results) {
 }
 
 function calculate() {
-    var args = {};
-    args.event = events[document.getElementById('event').value];
-    args.eventSafeguard = document.getElementById('event-safeguard').checked;
-    args.mvpDiscount = mvp[document.getElementById('mvp').value];
-    args.level = parseInt(document.getElementById('level').value);
-    var from = parseInt(document.getElementById('from').value);
-    var to = parseInt(document.getElementById('to').value);
-    args.safeguard = document.getElementById('safeguard').checked;
-    args.catcher = document.getElementById('catcher').checked;
-    var results = [];
-    for (var k = 0; k < to; k++) {
-        calculateStep(args, k, results);
+    try {
+        var args = {};
+        args.event = events[document.getElementById('event').value];
+        args.eventSafeguard = document.getElementById('event-safeguard').checked;
+        args.mvpDiscount = mvp[document.getElementById('mvp').value];
+        args.level = parseInt(document.getElementById('level').value);
+        var from = parseInt(document.getElementById('from').value);
+        var to = parseInt(document.getElementById('to').value);
+
+        args.safeguard = {};
+        for (var k = 0; k < 25; k++) {
+            args.safeguard[k] = false;
+        }
+        if (document.getElementById('safeguard').checked) {
+            var safeguardStars = document.getElementById('safeguard-stars').querySelectorAll('input');
+            for (var k = 0; k < safeguardStars.length; k++) {
+                if (safeguardStars[k].checked) {
+                    args.safeguard[safeguardStars[k].id.split('-')[1]] = true;
+                }
+            }
+        }
+
+        args.catcher = document.getElementById('catcher').checked;
+        var results = [];
+        for (var k = 0; k < to; k++) {
+            calculateStep(args, k, results);
+        }
+        var result = calculateRange(args, from, to, results);
+        var resultDiv = document.getElementById('results');
+        resultDiv.innerHTML = '';
+        var div = document.createElement('div');
+        div.innerHTML = 'Average Cost: ' + result.price.toLocaleString() + ' mesos';
+        resultDiv.appendChild(div);
+        div = document.createElement('div');
+        div.innerHTML = 'Average Destroys: ' + result.destroys;
+        resultDiv.appendChild(div);
+        div = document.createElement('div');
+        div.innerHTML = 'Chance of Destruction: ' + ((1 - result.noDestroyChance) * 100).toLocaleString() + '%';
+        resultDiv.appendChild(div);
+    } catch (e) {
+        console.error(e);
     }
-    var result = calculateRange(args, from, to, results);
-    var resultDiv = document.getElementById('results');
-    resultDiv.innerHTML = '';
-    var div = document.createElement('div');
-    div.innerHTML = 'Average Cost: ' + result.price.toLocaleString() + ' mesos';
-    resultDiv.appendChild(div);
-    div = document.createElement('div');
-    div.innerHTML = 'Average Destroys: ' + result.destroys;
-    resultDiv.appendChild(div);
-    div = document.createElement('div');
-    div.innerHTML = 'Chance of Destruction: ' + ((1 - result.noDestroyChance) * 100).toLocaleString() + '%';
-    resultDiv.appendChild(div);
+}
+
+function toggleSafeguard() {
+    var safeguard = document.getElementById('safeguard').checked;
+    var checkboxes = document.getElementById('safeguard-stars').querySelectorAll('input');
+    for (var k = 0; k < checkboxes.length; k++) {
+        checkboxes[k].disabled = !safeguard;
+    }
 }

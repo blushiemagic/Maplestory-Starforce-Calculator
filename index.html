@@ -42,11 +42,38 @@
         </div>
         <div>
             <label for="safeguard">Safeguard: </label>
-            <input type="checkbox" id="safeguard" value="safeguard">
+            <input type="checkbox" id="safeguard" value="safeguard" onchange="toggleSafeguard()">
+            <details id="safeguard-stars">
+                <summary>Safeguard Stars</summary>
+                <div>
+                    <label for="safeguard-12">12 to 13: </label>
+                    <input type="checkbox" id="safeguard-12" value="safeguard-12" checked disabled>
+                </div>
+                <div>
+                    <label for="safeguard-13">13 to 14: </label>
+                    <input type="checkbox" id="safeguard-13" value="safeguard-13" checked disabled>
+                </div>
+                <div>
+                    <label for="safeguard-14">14 to 15: </label>
+                    <input type="checkbox" id="safeguard-14" value="safeguard-14" checked disabled>
+                </div>
+                <div>
+                    <label for="safeguard-15">15 to 16: </label>
+                    <input type="checkbox" id="safeguard-15" value="safeguard-15" checked disabled>
+                </div>
+                <div>
+                    <label for="safeguard-16">16 to 17: </label>
+                    <input type="checkbox" id="safeguard-16" value="safeguard-16" checked disabled>
+                </div>
+            </details>
         </div>
         <div>
             <label for="catcher">Star Catching: </label>
             <input type="checkbox" id="catcher" value="catcher">
+            <details>
+                <summary>Star Catcher Stars</summary>
+                Coming Soon
+            </details>
         </div>
         <input type="submit" value="Calculate">
     </form>

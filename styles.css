@@ -1,3 +1,11 @@
-form div {
+form>div {
     margin-bottom: 0.5em;
+}
+
+details {
+    margin-top: 0.25em;
+}
+
+summary {
+    cursor: default;
 }
