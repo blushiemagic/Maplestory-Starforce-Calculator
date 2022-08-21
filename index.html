@@ -46,33 +46,110 @@
             <details id="safeguard-stars">
                 <summary>Safeguard Stars</summary>
                 <div>
-                    <label for="safeguard-12">12 to 13: </label>
-                    <input type="checkbox" id="safeguard-12" value="safeguard-12" checked disabled>
-                </div>
-                <div>
-                    <label for="safeguard-13">13 to 14: </label>
-                    <input type="checkbox" id="safeguard-13" value="safeguard-13" checked disabled>
-                </div>
-                <div>
-                    <label for="safeguard-14">14 to 15: </label>
-                    <input type="checkbox" id="safeguard-14" value="safeguard-14" checked disabled>
-                </div>
-                <div>
-                    <label for="safeguard-15">15 to 16: </label>
-                    <input type="checkbox" id="safeguard-15" value="safeguard-15" checked disabled>
-                </div>
-                <div>
-                    <label for="safeguard-16">16 to 17: </label>
-                    <input type="checkbox" id="safeguard-16" value="safeguard-16" checked disabled>
+                    <span class="bold">Note:</span> These options are only used if the Safeguard option above is checked.
+                    <div>
+                        <label for="safeguard-12">12 to 13: </label>
+                        <input type="checkbox" id="safeguard-12" value="safeguard-12" checked disabled>
+                    </div>
+                    <div>
+                        <label for="safeguard-13">13 to 14: </label>
+                        <input type="checkbox" id="safeguard-13" value="safeguard-13" checked disabled>
+                    </div>
+                    <div>
+                        <label for="safeguard-14">14 to 15: </label>
+                        <input type="checkbox" id="safeguard-14" value="safeguard-14" checked disabled>
+                    </div>
+                    <div>
+                        <label for="safeguard-15">15 to 16: </label>
+                        <input type="checkbox" id="safeguard-15" value="safeguard-15" checked disabled>
+                    </div>
+                    <div>
+                        <label for="safeguard-16">16 to 17: </label>
+                        <input type="checkbox" id="safeguard-16" value="safeguard-16" checked disabled>
+                    </div>
                 </div>
             </details>
         </div>
         <div>
             <label for="catcher">Star Catching: </label>
-            <input type="checkbox" id="catcher" value="catcher">
-            <details>
+            <input type="checkbox" id="catcher" value="catcher" onchange="toggleCatcher()">
+            <details id="catcher-stars">
                 <summary>Star Catcher Stars</summary>
-                Coming Soon
+                <div>
+                    <span class="bold">Note:</span> These options are only used if the Star Catching option above is checked.
+                    <div>
+                        <input type="button" value="Check All" onclick="checkAllCatcher()" disabled>
+                        <input type="button" value="Uncheck All" onclick="uncheckAllCatcher()" disabled>
+                    </div>
+                    <div>
+                        <label for="catcher-0">0 to 5: </label>
+                        <input type="checkbox" id="catcher-0" value="catcher-0" checked disabled>
+                    </div>
+                    <div>
+                        <label for="catcher-5">5 to 10: </label>
+                        <input type="checkbox" id="catcher-5" value="catcher-5" checked disabled>
+                    </div>
+                    <div>
+                        <label for="catcher-10">10 to 11: </label>
+                        <input type="checkbox" id="catcher-10" value="catcher-10" checked disabled>
+                    </div>
+                    <div>
+                        <label for="catcher-11">11 to 12: </label>
+                        <input type="checkbox" id="catcher-11" value="catcher-11" checked disabled>
+                    </div>
+                    <div>
+                        <label for="catcher-12">12 to 13: </label>
+                        <input type="checkbox" id="catcher-12" value="catcher-12" checked disabled>
+                    </div>
+                    <div>
+                        <label for="catcher-13">13 to 14: </label>
+                        <input type="checkbox" id="catcher-13" value="catcher-13" checked disabled>
+                    </div>
+                    <div>
+                        <label for="catcher-14">14 to 15: </label>
+                        <input type="checkbox" id="catcher-14" value="catcher-14" checked disabled>
+                    </div>
+                    <div>
+                        <label for="catcher-15">15 to 16: </label>
+                        <input type="checkbox" id="catcher-15" value="catcher-15" checked disabled>
+                    </div>
+                    <div>
+                        <label for="catcher-16">16 to 17: </label>
+                        <input type="checkbox" id="catcher-16" value="catcher-16" checked disabled>
+                    </div>
+                    <div>
+                        <label for="catcher-17">17 to 18: </label>
+                        <input type="checkbox" id="catcher-17" value="catcher-17" checked disabled>
+                    </div>
+                    <div>
+                        <label for="catcher-18">18 to 19: </label>
+                        <input type="checkbox" id="catcher-18" value="catcher-18" checked disabled>
+                    </div>
+                    <div>
+                        <label for="catcher-19">19 to 20: </label>
+                        <input type="checkbox" id="catcher-19" value="catcher-19" checked disabled>
+                    </div>
+                    <div>
+                        <label for="catcher-20">20 to 21: </label>
+                        <input type="checkbox" id="catcher-20" value="catcher-20" checked disabled>
+                    </div>
+                    <div>
+                        <label for="catcher-21">21 to 22: </label>
+                        <input type="checkbox" id="catcher-21" value="catcher-21" checked disabled>
+                    </div>
+                    <div>
+                        <label for="catcher-22">22 to 23: </label>
+                        <input type="checkbox" id="catcher-22" value="catcher-22" checked disabled>
+                    </div>
+                    <div>
+                        <label for="catcher-23">23 to 24: </label>
+                        <input type="checkbox" id="catcher-23" value="catcher-23" checked disabled>
+                    </div>
+                    <div>
+                        <label for="catcher-24">24 to 25: </label>
+                        <input type="checkbox" id="catcher-24" value="catcher-24" checked disabled>
+                    </div>
+                </div>
             </details>
         </div>
         <input type="submit" value="Calculate">

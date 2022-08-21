@@ -79,7 +79,7 @@ function getPrice(args, star) {
 
 function getSuccessRate(args, star) {
     var success = data[star].success;
-    if (args.catcher) {
+    if (args.catcher[star]) {
         success *= 1.05;
     }
     if ((args.event & events.guarantee) > 0 && (star === 5 || star === 10 || star === 15)) {
@@ -263,12 +263,33 @@ function calculate() {
             var safeguardStars = document.getElementById('safeguard-stars').querySelectorAll('input');
             for (var k = 0; k < safeguardStars.length; k++) {
                 if (safeguardStars[k].checked) {
-                    args.safeguard[safeguardStars[k].id.split('-')[1]] = true;
+                    var safeguardStar = parseInt(safeguardStars[k].id.split('-')[1]);
+                    args.safeguard[safeguardStar] = true;
                 }
             }
         }
 
-        args.catcher = document.getElementById('catcher').checked;
+        args.catcher = {};
+        for (var k = 0; k < 25; k++) {
+            args.catcher[k] = false;
+        }
+        if (document.getElementById('catcher').checked) {
+            var catcherStars = document.getElementById('catcher-stars').querySelectorAll('input[type=checkbox]');
+            for (var k = 0; k < catcherStars.length; k++) {
+                if (catcherStars[k].checked) {
+                    var catcherStar = parseInt(catcherStars[k].id.split('-')[1]);
+                    if (catcherStar < 10) {
+                        catcherStar = 5 * Math.floor(catcherStar / 5);
+                        for (var j = 0; j < 5; j++) {
+                            args.catcher[catcherStar + j] = true;
+                        }
+                    } else {
+                        args.catcher[catcherStar] = true;
+                    }
+                }
+            }
+        }
+
         var results = [];
         for (var k = 0; k < to; k++) {
             calculateStep(args, k, results);
@@ -295,5 +316,27 @@ function toggleSafeguard() {
     var checkboxes = document.getElementById('safeguard-stars').querySelectorAll('input');
     for (var k = 0; k < checkboxes.length; k++) {
         checkboxes[k].disabled = !safeguard;
+    }
+}
+
+function toggleCatcher() {
+    var catcher = document.getElementById('catcher').checked;
+    var elements = document.getElementById('catcher-stars').querySelectorAll('input');
+    for (var k = 0; k < elements.length; k++) {
+        elements[k].disabled = !catcher;
+    }
+}
+
+function checkAllCatcher() {
+    var checkboxes = document.getElementById('catcher-stars').querySelectorAll('input[type=checkbox]');
+    for (var k = 0; k < checkboxes.length; k++) {
+        checkboxes[k].checked = true;
+    }
+}
+
+function uncheckAllCatcher() {
+    var checkboxes = document.getElementById('catcher-stars').querySelectorAll('input[type=checkbox]');
+    for (var k = 0; k < checkboxes.length; k++) {
+        checkboxes[k].checked = false;
     }
 }

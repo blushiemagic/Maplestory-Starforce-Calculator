@@ -6,6 +6,14 @@ details {
     margin-top: 0.25em;
 }
 
+details>div {
+    margin-left: 1em;
+}
+
 summary {
     cursor: default;
+}
+
+.bold {
+    font-weight: bold;
 }
