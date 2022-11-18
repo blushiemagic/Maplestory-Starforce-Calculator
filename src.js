@@ -52,17 +52,10 @@ function getPrice(args, star) {
         base = Math.pow(level, 3) * (star + 1) / 2500;
     } else if (star < 15) {
         base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 40000;
-    } else if (star < 18) {
-        base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 12000;
-    } else if (star < 20) {
-        base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 11000;
     } else {
-        base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 10000;
+        base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 20000;
     }
     base = Math.round(base) + 10;
-    if (star >= 15) {
-        base = Math.round(0.78 * base);
-    }
     base *= 100;
     var multiplier = 1;
     if (star < 17) {
