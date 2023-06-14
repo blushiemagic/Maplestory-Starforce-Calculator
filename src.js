@@ -29,10 +29,10 @@ const data = {
     8: { success: 0.6, drop: false },
     9: { success: 0.55, drop: false },
     10: { success: 0.5, drop: false },
-    11: { success: 0.45, drop: true },
-    12: { success: 0.4, drop: true, destroy: 0.01, safeguard: true },
-    13: { success: 0.35, drop: true, destroy: 0.02, safeguard: true },
-    14: { success: 0.3, drop: true, destroy: 0.02, safeguard: true },
+    11: { success: 0.45, drop: false },
+    12: { success: 0.4, drop: false },
+    13: { success: 0.35, drop: false },
+    14: { success: 0.3, drop: false },
     15: { success: 0.3, drop: false, destroy: 0.03, safeguard: true },
     16: { success: 0.3, drop: true, destroy: 0.03, safeguard: true },
     17: { success: 0.3, drop: true, destroy: 0.03, safeguard: false },
@@ -50,8 +50,16 @@ function getPrice(args, star) {
     var base;
     if (star < 10) {
         base = Math.pow(level, 3) * (star + 1) / 2500;
-    } else if (star < 15) {
+    } else if (star === 10) {
         base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 40000;
+    } else if (star === 11) {
+        base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 22000;
+    } else if (star === 12) {
+        base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 15000;
+    } else if (star === 13) {
+        base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 11000;
+    } else if (star === 14) {
+        base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 7500;
     } else {
         base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 20000;
     }
@@ -177,7 +185,7 @@ function calculateStep(args, star, results) {
                 failureTable.push(entry);
                 remainingRate -= entry.weight;
             }
-            //scenario: drop a second time and activate chance time
+            //scenario: drop a second time and activate chance time (as of savior this will never get called)
             if (skipEvent && star - 2 <= 10) {
                 entry = {
                     weight: remainingRate,
@@ -271,7 +279,7 @@ function calculate() {
             for (var k = 0; k < catcherStars.length; k++) {
                 if (catcherStars[k].checked) {
                     var catcherStar = parseInt(catcherStars[k].id.split('-')[1]);
-                    if (catcherStar < 10) {
+                    if (catcherStar < 15) {
                         catcherStar = 5 * Math.floor(catcherStar / 5);
                         for (var j = 0; j < 5; j++) {
                             args.catcher[catcherStar + j] = true;
