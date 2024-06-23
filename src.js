@@ -250,7 +250,7 @@ function calculate() {
     try {
         var args = {};
         args.event = events[document.getElementById('event').value];
-        args.eventSafeguard = document.getElementById('event-safeguard').checked;
+        args.eventSafeguard = false;
         args.mvpDiscount = mvp[document.getElementById('mvp').value];
         args.level = parseInt(document.getElementById('level').value);
         var from = parseInt(document.getElementById('from').value);
