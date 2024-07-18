@@ -126,8 +126,20 @@
         </div>
         <input type="submit" value="Calculate">
     </form>
-    <div id="results"></div>
-    <canvas id="destroy-graph" width="360" height="240" hidden></canvas>
+    <div id="results" hidden>
+        <div>Average Cost: <span id="cost-average"></span> mesos</div>
+        <div>Average Destroys: <span id="destroy-average"></span></div>
+        <div id="destroy-details" class="section">
+            <div>Chance of Destruction: <span id="destroy-chance"></span>%</div>
+            <ul>
+                <li>25% Percentile: <span id="destroy-percent-25"></span> Destroys</li>
+                <li>50% Percentile: <span id="destroy-percent-50"></span> Destroys (Median)</li>
+                <li>75% Percentile: <span id="destroy-percent-75"></span> Destroys</li>
+                <li>95% Percentile: <span id="destroy-percent-95"></span> Destroys</li>
+            </ul>
+            <canvas id="destroy-graph" width="436" height="280"></canvas>
+        </div>
+    </div>
     <footer>
         <div>Made by blushiemagic</div>
         <div><a href="https://github.com/blushiemagic/Maplestory-Starforce-Calculator">Source Code</a></div>

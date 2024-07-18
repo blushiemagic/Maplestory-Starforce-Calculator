@@ -296,19 +296,108 @@ function calculate() {
             calculateStep(args, k, results);
         }
         var result = calculateRange(args, from, to, results);
+        var resultFrom12 = result;
+        if (from != 12 && to > 12) {
+            resultFrom12 = calculateRange(args, 12, to, results);
+        }
+
         var resultDiv = document.getElementById('results');
-        resultDiv.innerHTML = '';
-        var div = document.createElement('div');
-        div.innerHTML = 'Average Cost: ' + result.price.toLocaleString() + ' mesos';
-        resultDiv.appendChild(div);
-        div = document.createElement('div');
-        div.innerHTML = 'Average Destroys: ' + result.destroys;
-        resultDiv.appendChild(div);
-        div = document.createElement('div');
-        div.innerHTML = 'Chance of Destruction: ' + ((1 - result.noDestroyChance) * 100).toLocaleString() + '%';
-        resultDiv.appendChild(div);
+        resultDiv.hidden = true;
+        document.getElementById('cost-average').innerHTML = result.price.toLocaleString();
+        document.getElementById('destroy-average').innerHTML = result.destroys;
+
+        document.getElementById('destroy-details').hidden = true;
+        if (result.noDestroyChance < 1) {
+            document.getElementById('destroy-chance').innerHTML = ((1 - result.noDestroyChance) * 100).toLocaleString();
+            function getPercentile(percentile) {
+                var base = 1 - resultFrom12.noDestroyChance;
+                var value = (1 - percentile) / (1 - result.noDestroyChance);
+                return Math.ceil(Math.log(value) / Math.log(base));
+            }
+            document.getElementById('destroy-percent-25').innerHTML = getPercentile(0.25);
+            document.getElementById('destroy-percent-50').innerHTML = getPercentile(0.5);
+            document.getElementById('destroy-percent-75').innerHTML = getPercentile(0.75);
+            document.getElementById('destroy-percent-95').innerHTML = getPercentile(0.95);
+            var canvas = document.getElementById('destroy-graph');
+            drawDestroyGraph(canvas, result.noDestroyChance, resultFrom12.noDestroyChance);
+            document.getElementById('destroy-details').hidden = false;
+        }
+
+        resultDiv.hidden = false;
     } catch (e) {
         console.error(e);
+    }
+}
+
+function drawDestroyGraph(canvas, noDestroyChance, noDestroyFrom12Chance) {
+    const numSamples = 10;
+    var moreDestroyChance = 1 - noDestroyChance;
+    var destroyChances = [ noDestroyChance ];
+    for (var k = 0; k < numSamples; k++) {
+        moreDestroyChance *= 1 - noDestroyFrom12Chance;
+        destroyChances.push(1 - moreDestroyChance);
+    }
+
+    var context = canvas.getContext('2d');
+    context.reset();
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.lineCap = 'square';
+    context.font = '12px sans-serif';
+    const topPadding = 40;
+    const padding = 60;
+    context.beginPath();
+    context.moveTo(padding + 0.5, topPadding + 0.5);
+    context.lineTo(padding + 0.5, canvas.height - padding - 0.5);
+    context.lineTo(canvas.width - 0.5, canvas.height - padding - 0.5);
+    context.stroke();
+
+    var percents = [ 0.25, 0.5, 0.75, 0.95 ];
+    context.fillStyle = 'black';
+    context.strokeStyle = 'rgba(0, 0, 0, 0.6)';
+    for (var percent of percents) {
+        var height = (canvas.height - topPadding - padding) * (1 - percent);
+        height = topPadding + Math.floor(height) + 0.5;
+        context.beginPath();
+        context.moveTo(padding + 0.5, height);
+        context.lineTo(canvas.width - 0.5, height);
+        context.stroke();
+        var text = (100 * percent) + '%';
+        var textWidth = context.measureText(text).width;
+        context.fillText(text, padding - 4 - textWidth, height + 5);
+    }
+    context.beginPath();
+    context.moveTo(padding + 0.5, topPadding + 0.5);
+    context.lineTo(canvas.width - 0.5, topPadding + 0.5);
+    context.stroke();
+
+    for (var k = 0; k <= numSamples; k++) {
+        var gradient = context.createLinearGradient(0, 0, topPadding, canvas.height - padding);
+        var r = Math.floor(k * 255 / 2 / numSamples);
+        var b = 255 - Math.floor(k * 255 / 2 / numSamples);
+        gradient.addColorStop(0, `rgb(${1.5 * r}, ${b}, ${b})`);
+        gradient.addColorStop(1, `rgb(${r}, 0, ${b})`);
+        context.fillStyle = gradient;
+        var barHeight = destroyChances[k] * (canvas.height - topPadding - padding);
+        context.fillRect(padding + 16 + 32 * k, canvas.height - padding - barHeight, 24, barHeight);
+        context.fillStyle = 'black';
+        var textWidth = context.measureText(k).width;
+        context.fillText(k, padding + 16 + 32 * k + (24 - textWidth) / 2, canvas.height - padding + 16);
+    }
+
+    context.font = 'bold 24px sans-serif';
+    context.fillStyle = 'black';
+    var text = 'Chance of X or Fewer Destroys';
+    var textWidth = context.measureText(text).width;
+    context.fillText(text, (canvas.width - textWidth) / 2, 30);
+    text = 'Destroys';
+    textWidth = context.measureText(text).width;
+    context.fillText(text, (padding + canvas.width - textWidth) / 2, canvas.height - 10);
+    text = 'Percentile';
+    context.font = 'bold 16px sans-serif';
+    var y = topPadding + (canvas.height - topPadding - padding - 16 * text.length) / 2;
+    for (var k = 0; k < text.length; k++) {
+        textWidth = context.measureText(text[k]).width;
+        context.fillText(text[k], padding / 4 - textWidth / 2, y + 16 * (k + 1));
     }
 }
 
