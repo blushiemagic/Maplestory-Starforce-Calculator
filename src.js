@@ -5,45 +5,133 @@ const events = {
     discount: 1,
     guarantee: 2,
     extra: 4,
-    shining: 3
-}
+    lowerDestroy: 8,
+    shining: 9,
+    shining2: 11
+};
 
 const mvp = {
     none: 1,
     silver: 0.97,
     gold: 0.95,
     diamond: 0.9
-}
+};
 
 const destroyStar = 12;
 
 const data = {
-    0: { success: 0.95, drop: false },
-    1: { success: 0.9, drop: false },
-    2: { success: 0.85, drop: false },
-    3: { success: 0.85, drop: false },
-    4: { success: 0.8, drop: false },
-    5: { success: 0.75, drop: false },
-    6: { success: 0.7, drop: false },
-    7: { success: 0.65, drop: false },
-    8: { success: 0.6, drop: false },
-    9: { success: 0.55, drop: false },
-    10: { success: 0.5, drop: false },
-    11: { success: 0.45, drop: false },
-    12: { success: 0.4, drop: false },
-    13: { success: 0.35, drop: false },
-    14: { success: 0.3, drop: false },
-    15: { success: 0.3, drop: false, destroy: 0.03, safeguard: true },
-    16: { success: 0.3, drop: true, destroy: 0.03, safeguard: true },
-    17: { success: 0.3, drop: true, destroy: 0.03, safeguard: false },
-    18: { success: 0.3, drop: true, destroy: 0.04, safeguard: false },
-    19: { success: 0.3, drop: true, destroy: 0.04, safeguard: false },
-    20: { success: 0.3, drop: false, destroy: 0.1, safeguard: false },
-    21: { success: 0.3, drop: true, destroy: 0.1, safeguard: false },
-    22: { success: 0.03, drop: true, destroy: 0.2, safeguard: false },
-    23: { success: 0.02, drop: true, destroy: 0.3, safeguard: false },
-    24: { success: 0.01, drop: true, destroy: 0.4, safeguard: false }
+    0: { success: 0.95 },
+    1: { success: 0.9 },
+    2: { success: 0.85 },
+    3: { success: 0.85 },
+    4: { success: 0.8 },
+    5: { success: 0.75 },
+    6: { success: 0.7 },
+    7: { success: 0.65 },
+    8: { success: 0.6 },
+    9: { success: 0.55 },
+    10: { success: 0.5 },
+    11: { success: 0.45 },
+    12: { success: 0.4 },
+    13: { success: 0.35 },
+    14: { success: 0.3 },
+    15: { success: 0.3, destroy: 0.03, destroyStar: 12, safeguard: true },
+    16: { success: 0.3, destroy: 0.03, destroyStar: 12, safeguard: true },
+    17: { success: 0.15, destroy: 0.08, destroyStar: 12, safeguard: true },
+    18: { success: 0.15, destroy: 0.08, destroyStar: 12, safeguard: false },
+    19: { success: 0.15, destroy: 0.1, destroyStar: 12, safeguard: false },
+    20: { success: 0.3, destroy: 0.15, destroyStar: 15, safeguard: false },
+    21: { success: 0.15, destroy: 0.15, destroyStar: 17, safeguard: false },
+    22: { success: 0.15, destroy: 0.2, destroyStar: 17, safeguard: false },
+    23: { success: 0.1, destroy: 0.2, destroyStar: 19, safeguard: false },
+    24: { success: 0.1, destroy: 0.2, destroyStar: 19, safeguard: false },
+    25: { success: 0.1, destroy: 0.2, destroyStar: 19, safeguard: false },
+    26: { success: 0.07, destroy: 0.2, destroyStar: 20, safeguard: false },
+    27: { success: 0.05, destroy: 0.2, destroyStar: 20, safeguard: false },
+    28: { success: 0.03, destroy: 0.2, destroyStar: 20, safeguard: false },
+    29: { success: 0.01, destroy: 0.2, destroyStar: 20, safeguard: false }
 };
+
+class Matrix {
+    #rows;
+    #columns;
+    #rowContents;
+
+    constructor(rows) {
+        if (!rows) {
+            throw Error('No rows provided');
+        }
+        if (!rows.length) {
+            throw Error('Empty rows provided');
+        }
+        if (!rows[0].length) {
+            throw Error('Empty row at index 0');
+        }
+        this.#rows = rows.length;
+        this.#columns = rows[0].length;
+        this.#rowContents = new Array(rows.length);
+        for (var k = 0; k < this.#rows; k++) {
+            if (rows[k].length != this.#columns) {
+                throw Error('Rows have different sizes');
+            }
+            this.#rowContents[k] = [...rows[k]];
+        }
+    }
+
+    get rows() {
+        return this.#rows;
+    }
+
+    get columns() {
+        return this.#columns;
+    }
+
+    get(row, column) {
+        return this.#rowContents[row][column];
+    }
+
+    copyContents() {
+        return this.#rowContents.map(row => [...row]);
+    }
+
+    toString() {
+        return this.#rowContents.map(row => row.toString()).join(',\n');
+    }
+
+    static newColumn(column) {
+        return new Matrix(column.map(entry => [entry]));
+    }
+
+    static identity(size) {
+        var rowContents = new Array(size);
+        for (var k = 0; k < size; k++) {
+            rowContents[k] = new Array(size).fill(0);
+            rowContents[k][k] = 1;
+        }
+        return new Matrix(rowContents);
+    }
+
+    static ones(rows, columns) {
+        return new Matrix(new Array(rows).fill(new Array(columns).fill(1)));
+    }
+
+    static mult(matrix1, matrix2) {
+        if (matrix1.columns != matrix2.rows) {
+            throw Error('Matrix 1 columns != Matrix 2 rows');
+        }
+        var rowContents = new Array(matrix1.rows);
+        for (var r = 0; r < matrix1.rows; r++) {
+            rowContents[r] = new Array(matrix2.columns);
+            for (var c = 0; c < matrix2.columns; c++) {
+                rowContents[r][c] = 0;
+                for (var k = 0; k < matrix1.columns; k++) {
+                    rowContents[r][c] += matrix1.get(r, k) * matrix2.get(k, c);
+                }
+            }
+        }
+        return new Matrix(rowContents);
+    }
+}
 
 function getPrice(args, star) {
     var level = Math.floor(args.level / 10) * 10;
@@ -60,8 +148,16 @@ function getPrice(args, star) {
         base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 11000;
     } else if (star === 14) {
         base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 7500;
-    } else {
+    } else if (star === 15 || star === 16 || star === 20 || star >= 22) {
         base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 20000;
+    } else if (star === 17) {
+        base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 15000;
+    } else if (star === 18) {
+        base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 7000;
+    } else if (star === 19) {
+        base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 4500;
+    } else if (star === 21) {
+        base = Math.pow(level, 3) * Math.pow(star + 1, 2.7) / 12500;
     }
     base = Math.round(base) + 10;
     base *= 100;
@@ -73,7 +169,7 @@ function getPrice(args, star) {
         multiplier *= 0.7;
     }
     if (args.safeguard[star] && data[star].safeguard && canDestroy(args, star)) {
-        multiplier += 1;
+        multiplier += 2;
     }
     return base * multiplier;
 }
@@ -94,10 +190,21 @@ function canDestroy(args, star) {
     if ((args.event & events.guarantee) > 0 && (star == 5 || star == 10 || star == 15)) {
         result = false;
     }
-    if (args.eventSafeguard && star < 15) {
-        result = false
-    }
     return result;
+}
+
+function getDestroyRate(args, star) {
+    var rate = data[star].destroy;
+    if ((args.event & events.lowerDestroy) > 0 && star < 22) {
+        rate *= 0.7;
+    }
+    if (args.safeguard[star] && data[star].safeguard) {
+        rate = 0;
+    }
+    if (!canDestroy(args, star)) {
+        rate = 0;
+    }
+    return rate;
 }
 
 function calculateRange(args, from, to, results) {
@@ -134,97 +241,36 @@ function calculateStep(args, star, results) {
     }
 
     //calculate cost of failure
-    //given: already 1 failure
     var failureTable = [];
     var remainingRate = 1;
     var entry;
     if (canDestroy(args, star) && !(args.safeguard[star] && data[star].safeguard)) {
         //scenario: failure is a destroy
         entry = {
-            weight: remainingRate * data[star].destroy,
+            weight: remainingRate * getDestroyRate(args, star),
             price: price,
             destroys: 1,
             noDestroyChance: 0
         };
-        if (star > destroyStar) {
-            var range = calculateRange(args, destroyStar, star, results);
+        if (star > data[star].destroyStar) {
+            var range = calculateRange(args, data[star].destroyStar, star, results);
             entry.price += range.price;
             entry.destroys += range.destroys;
         }
         failureTable.push(entry);
         remainingRate -= entry.weight;
     }
-    if (data[star].drop) {
-        //scenario: failure is a drop
-        if (data[star - 1].drop) {
-            //if (we can still drop more)
-            //scenario: success immediately after failing
-            var dropPrice = getPrice(args, star - 1);
-            var dropSuccess = getSuccessRate(args, star - 1);
-            entry = {
-                weight: remainingRate * dropSuccess,
-                price: dropPrice + price,
-                destroys: 0,
-                noDestroyChance: 1
-            };
-            failureTable.push(entry);
-            remainingRate -= entry.weight;
-            if (canDestroy(args, star - 1) && !(args.safeguard[star - 1] && data[star - 1].safeguard)) {
-                //scenario: destroy right after failing
-                entry = {
-                    weight: remainingRate * data[star - 1].destroy,
-                    price: dropPrice + price,
-                    destroys: 1,
-                    noDestroyChance: 0
-                };
-                if (star > destroyStar) {
-                    var range = calculateRange(args, destroyStar, star, results);
-                    entry.price += range.price;
-                    entry.destroys += range.destroys;
-                }
-                failureTable.push(entry);
-                remainingRate -= entry.weight;
-            }
-            //scenario: drop a second time and activate chance time (as of savior this will never get called)
-            if (skipEvent && star - 2 <= 10) {
-                entry = {
-                    weight: remainingRate,
-                    price: getPrice(args, star - 2) + dropPrice + price,
-                    destroys: 0,
-                    noDestroyChance: 1
-                };
-            } else {
-                entry = {
-                    weight: remainingRate,
-                    price: getPrice(args, star - 2) + dropPrice + price + results[star - 1].price,
-                    destroys: results[star - 1].destroys,
-                    noDestroyChance: results[star - 1].noDestroyChance
-                };
-            }
-            failureTable.push(entry);
-            remainingRate -= entry.weight;
-        } else {
-            //if (we can't drop anymore)
-            entry = {
-                weight: remainingRate,
-                price: price + results[star - 1].price,
-                destroys: results[star - 1].destroys,
-                noDestroyChance: results[star - 1].noDestroyChance
-            };
-            failureTable.push(entry);
-            remainingRate -= entry.weight;
-        }
-    } else {
-        //scenario: failure is a keep
-        entry = {
-            weight: remainingRate,
-            price: price,
-            destroys: 0,
-            noDestroyChance: 1
-        };
-        failureTable.push(entry);
-        remainingRate -= entry.weight;
-    }
+
+    //scenario: failure is a keep
+    entry = {
+        weight: remainingRate,
+        price: price,
+        destroys: 0,
+        noDestroyChance: 1
+    };
+    failureTable.push(entry);
+    remainingRate -= entry.weight;
+
     var failurePrice = 0;
     var failureDestroys = 0;
     var destroyChance = 0;
@@ -248,16 +294,19 @@ function calculateStep(args, star, results) {
 
 function calculate() {
     try {
+        var resultDiv = document.getElementById('results');
+        resultDiv.hidden = true;
+        document.getElementById('destroy-details').hidden = true;
+
         var args = {};
         args.event = events[document.getElementById('event').value];
-        args.eventSafeguard = false;
         args.mvpDiscount = mvp[document.getElementById('mvp').value];
         args.level = parseInt(document.getElementById('level').value);
         var from = parseInt(document.getElementById('from').value);
         var to = parseInt(document.getElementById('to').value);
 
         args.safeguard = {};
-        for (var k = 0; k < 25; k++) {
+        for (var k = 0; k < 30; k++) {
             args.safeguard[k] = false;
         }
         if (document.getElementById('safeguard').checked) {
@@ -271,7 +320,7 @@ function calculate() {
         }
 
         args.catcher = {};
-        for (var k = 0; k < 25; k++) {
+        for (var k = 0; k < 30; k++) {
             args.catcher[k] = false;
         }
         if (document.getElementById('catcher').checked) {
@@ -291,51 +340,146 @@ function calculate() {
             }
         }
 
+        // Calculate main results
+
         var results = [];
         for (var k = 0; k < to; k++) {
             calculateStep(args, k, results);
         }
         var result = calculateRange(args, from, to, results);
-        var resultFrom12 = result;
-        if (from != 12 && to > 12) {
-            resultFrom12 = calculateRange(args, 12, to, results);
-        }
 
-        var resultDiv = document.getElementById('results');
-        resultDiv.hidden = true;
         document.getElementById('cost-average').innerHTML = result.price.toLocaleString();
         document.getElementById('destroy-average').innerHTML = result.destroys;
+        resultDiv.hidden = false;
 
-        document.getElementById('destroy-details').hidden = true;
+        // Calculate destroy percents
         if (result.noDestroyChance < 1) {
-            document.getElementById('destroy-chance').innerHTML = ((1 - result.noDestroyChance) * 100).toLocaleString();
-            function getPercentile(percentile) {
-                var base = 1 - resultFrom12.noDestroyChance;
-                var value = (1 - percentile) / (1 - result.noDestroyChance);
-                return Math.ceil(Math.log(value) / Math.log(base));
+            var lowestStar = from;
+            for (var star in data) {
+                if (getDestroyRate(args, star) > 0 && data[star].destroyStar < lowestStar) {
+                    lowestStar = data[star].destroyStar;
+                }
             }
-            document.getElementById('destroy-percent-25').innerHTML = getPercentile(0.25);
-            document.getElementById('destroy-percent-50').innerHTML = getPercentile(0.5);
-            document.getElementById('destroy-percent-75').innerHTML = getPercentile(0.75);
-            document.getElementById('destroy-percent-95').innerHTML = getPercentile(0.95);
+
+            var resultFromTo = {};
+            for (var calcFrom = lowestStar; calcFrom < to; calcFrom++) {
+                resultFromTo[calcFrom] = {};
+                for (var calcTo = calcFrom + 1; calcTo <= to; calcTo++) {
+                    resultFromTo[calcFrom][calcTo] = calculateRange(args, calcFrom, calcTo, results);
+                }
+            }
+
+            var destroyStars = [];
+            for (var k = lowestStar; k < to; k++) {
+                if (getDestroyRate(args, k) > 0 && !destroyStars.includes(data[k].destroyStar)) {
+                    destroyStars.push(data[k].destroyStar);
+                }
+            }
+
+            var matrixContents = new Array(destroyStars.length);
+            for (var r = 0; r < destroyStars.length; r++) {
+                matrixContents[r] = new Array(destroyStars.length);
+                var calcFrom = destroyStars[r];
+                for (var c = 0; c < destroyStars.length; c++) {
+                    matrixContents[r][c] = 0;
+                    for (var k = calcFrom; k < to; k++) {
+                        if (getDestroyRate(args, k) > 0 && data[k].destroyStar == destroyStars[c]) {
+                            var successRate = getSuccessRate(args, k);
+                            var destroyChance = (1 - successRate) * getDestroyRate(args, k);
+                            destroyChance = destroyChance / (successRate + destroyChance);
+                            var starChance = calcFrom == k ? 1 : resultFromTo[calcFrom][k].noDestroyChance;
+                            matrixContents[r][c] += starChance * destroyChance;
+                        }
+                    }
+                }
+            }
+            var destroyDistribution = new Matrix(matrixContents);
+
+            matrixContents = [new Array(destroyStars.length).fill(0)];
+            for (var k = from; k < to; k++) {
+                if (getDestroyRate(args, k) > 0) {
+                    var successRate = getSuccessRate(args, k);
+                    var destroyChance = (1 - successRate) * getDestroyRate(args, k);
+                    destroyChance = destroyChance / (successRate + destroyChance);
+                    var starChance = from == k ? 1 : resultFromTo[from][k].noDestroyChance;
+                    var destroyIndex = destroyStars.indexOf(data[k].destroyStar);
+                    matrixContents[0][destroyIndex] += starChance * destroyChance;
+                }
+            }
+            var firstDistribution = new Matrix(matrixContents);
+
+            var numDestroyDistributions = new Map();
+            numDestroyDistributions.set(0, Matrix.identity(destroyStars.length));
+            numDestroyDistributions.set(1, destroyDistribution);
+            function getPercentile(destroyCount) {
+                var distribution = Matrix.mult(firstDistribution, numDestroyDistributions.get(destroyCount));
+                return 1 - Matrix.mult(distribution, Matrix.ones(destroyStars.length, 1)).get(0, 0);
+            }
+            // binary search time
+            var last = 1;
+            var count = 0;
+            var increment = 1;
+            const percentiles = [0.25, 0.5, 0.75, 0.95];
+            var percentileDestroys = [0, 0, 0, 0];
+            for (var k = 0; k < percentiles.length; k++) {
+                if (count == 0 && getPercentile(0) >= percentiles[k]) {
+                    percentileDestroys[k] = 0;
+                } else if (last == 1 && getPercentile(1) >= percentiles[k]) {
+                    percentileDestroys[k] = 1;
+                } else {
+                    count = last;
+                    var currentPercentile = getPercentile(count);
+                    while (currentPercentile < percentiles[k]) {
+                        var distribution = numDestroyDistributions.get(count);
+                        count *= 2;
+                        last = count;
+                        numDestroyDistributions.set(count, Matrix.mult(distribution, distribution));
+                        currentPercentile = getPercentile(count);
+                    }
+                    increment = count / 2;
+                    while (increment > 1) {
+                        increment /= 2;
+                        if (currentPercentile >= percentiles[k]) {
+                            count -= 2 * increment;
+                        }
+                        if (!numDestroyDistributions.has(count + increment)) {
+                            var countDistribution = numDestroyDistributions.get(count);
+                            var incrementDistribution = numDestroyDistributions.get(increment);
+                            numDestroyDistributions.set(count + increment, Matrix.mult(countDistribution, incrementDistribution));
+                        }
+                        count += increment;
+                        currentPercentile = getPercentile(count);
+                    }
+                    if (currentPercentile < percentiles[k]) {
+                        percentileDestroys[k] = count + 1;
+                    } else {
+                        percentileDestroys[k] = count;
+                    }
+                }
+            }
+
+            document.getElementById('destroy-chance').innerHTML = ((1 - result.noDestroyChance) * 100).toLocaleString();
+            for (var k = 0; k < percentiles.length; k++) {
+                document.getElementById('destroy-percent-' + (100 * percentiles[k])).innerHTML = percentileDestroys[k];
+            }
             var canvas = document.getElementById('destroy-graph');
-            drawDestroyGraph(canvas, result.noDestroyChance, resultFrom12.noDestroyChance);
+            drawDestroyGraph(canvas, firstDistribution, destroyDistribution);
             document.getElementById('destroy-details').hidden = false;
         }
-
-        resultDiv.hidden = false;
     } catch (e) {
         console.error(e);
     }
 }
 
-function drawDestroyGraph(canvas, noDestroyChance, noDestroyFrom12Chance) {
+function drawDestroyGraph(canvas, firstDistribution, destroyDistribution) {
     const numSamples = 10;
-    var moreDestroyChance = 1 - noDestroyChance;
-    var destroyChances = [ noDestroyChance ];
+    var ones = Matrix.ones(firstDistribution.columns, 1);
+    var moreDestroyChance = Matrix.mult(firstDistribution, ones);
+    var destroyChances = [ 1 - moreDestroyChance.get(0, 0) ];
+    var distribution = firstDistribution;
     for (var k = 0; k < numSamples; k++) {
-        moreDestroyChance *= 1 - noDestroyFrom12Chance;
-        destroyChances.push(1 - moreDestroyChance);
+        distribution = Matrix.mult(distribution, destroyDistribution);
+        destroyChances.push(1 - Matrix.mult(distribution, ones).get(0, 0));
     }
 
     var context = canvas.getContext('2d');
