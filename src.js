@@ -17,8 +17,6 @@ const mvp = {
     diamond: 0.9
 };
 
-const destroyStar = 12;
-
 const data = {
     0: { success: 0.95 },
     1: { success: 0.9 },
@@ -50,6 +48,25 @@ const data = {
     27: { success: 0.05, destroy: 0.2, destroyStar: 20, safeguard: false },
     28: { success: 0.03, destroy: 0.2, destroyStar: 20, safeguard: false },
     29: { success: 0.01, destroy: 0.2, destroyStar: 20, safeguard: false }
+};
+
+const enhancementModes = {
+    1: {
+        true: { cost: 1, success: 1, destroy: 1 },
+        false: { cost: 1, success: 1, destroy: 1 }
+    },
+    2: {
+        true: { cost: 1.5, success: 5/6, destroy: 2/3 },
+        false: { cost: 2, success: 5/6, destroy: 2/3 }
+    },
+    3: {
+        true: { cost: 2.5, success: 2/3, destroy: 1/3 },
+        false: { cost: 3.5, success: 2/3, destroy: 1/3 }
+    },
+    4: {
+        true: { cost: 3, success: 1, destroy: 0 },
+        false: { cost: 6.5, success: 1/2, destroy: 0 }
+    }
 };
 
 class Matrix {
@@ -176,7 +193,7 @@ function getPrice(args, star) {
 
 function getSuccessRate(args, star) {
     var success = data[star].success;
-    if (args.catcher[star]) {
+    if (args.catcher) {
         success *= 1.05;
     }
     if ((args.event & events.guarantee) > 0 && (star === 5 || star === 10 || star === 15)) {
@@ -319,26 +336,7 @@ function calculate() {
             }
         }
 
-        args.catcher = {};
-        for (var k = 0; k < 30; k++) {
-            args.catcher[k] = false;
-        }
-        if (document.getElementById('catcher').checked) {
-            var catcherStars = document.getElementById('catcher-stars').querySelectorAll('input[type=checkbox]');
-            for (var k = 0; k < catcherStars.length; k++) {
-                if (catcherStars[k].checked) {
-                    var catcherStar = parseInt(catcherStars[k].id.split('-')[1]);
-                    if (catcherStar < 15) {
-                        catcherStar = 5 * Math.floor(catcherStar / 5);
-                        for (var j = 0; j < 5; j++) {
-                            args.catcher[catcherStar + j] = true;
-                        }
-                    } else {
-                        args.catcher[catcherStar] = true;
-                    }
-                }
-            }
-        }
+        args.catcher = document.getElementById('catcher').checked;
 
         // Calculate main results
 
@@ -550,27 +548,5 @@ function toggleSafeguard() {
     var checkboxes = document.getElementById('safeguard-stars').querySelectorAll('input');
     for (var k = 0; k < checkboxes.length; k++) {
         checkboxes[k].disabled = !safeguard;
-    }
-}
-
-function toggleCatcher() {
-    var catcher = document.getElementById('catcher').checked;
-    var elements = document.getElementById('catcher-stars').querySelectorAll('input');
-    for (var k = 0; k < elements.length; k++) {
-        elements[k].disabled = !catcher;
-    }
-}
-
-function checkAllCatcher() {
-    var checkboxes = document.getElementById('catcher-stars').querySelectorAll('input[type=checkbox]');
-    for (var k = 0; k < checkboxes.length; k++) {
-        checkboxes[k].checked = true;
-    }
-}
-
-function uncheckAllCatcher() {
-    var checkboxes = document.getElementById('catcher-stars').querySelectorAll('input[type=checkbox]');
-    for (var k = 0; k < checkboxes.length; k++) {
-        checkboxes[k].checked = false;
     }
 }
