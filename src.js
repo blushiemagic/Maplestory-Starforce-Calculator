@@ -33,40 +33,49 @@ const data = {
     12: { success: 0.4 },
     13: { success: 0.35 },
     14: { success: 0.3 },
-    15: { success: 0.3, destroy: 0.03, destroyStar: 12, safeguard: true },
-    16: { success: 0.3, destroy: 0.03, destroyStar: 12, safeguard: true },
-    17: { success: 0.15, destroy: 0.08, destroyStar: 12, safeguard: true },
-    18: { success: 0.15, destroy: 0.08, destroyStar: 12, safeguard: false },
-    19: { success: 0.15, destroy: 0.1, destroyStar: 12, safeguard: false },
-    20: { success: 0.3, destroy: 0.15, destroyStar: 15, safeguard: false },
-    21: { success: 0.15, destroy: 0.15, destroyStar: 17, safeguard: false },
-    22: { success: 0.15, destroy: 0.2, destroyStar: 17, safeguard: false },
-    23: { success: 0.1, destroy: 0.2, destroyStar: 19, safeguard: false },
-    24: { success: 0.1, destroy: 0.2, destroyStar: 19, safeguard: false },
-    25: { success: 0.1, destroy: 0.2, destroyStar: 19, safeguard: false },
-    26: { success: 0.07, destroy: 0.2, destroyStar: 20, safeguard: false },
-    27: { success: 0.05, destroy: 0.2, destroyStar: 20, safeguard: false },
-    28: { success: 0.03, destroy: 0.2, destroyStar: 20, safeguard: false },
-    29: { success: 0.01, destroy: 0.2, destroyStar: 20, safeguard: false }
-};
-
-const enhancementModes = {
-    1: {
-        true: { cost: 1, success: 1, destroy: 1 },
-        false: { cost: 1, success: 1, destroy: 1 }
-    },
-    2: {
-        true: { cost: 1.5, success: 5/6, destroy: 2/3 },
-        false: { cost: 2, success: 5/6, destroy: 2/3 }
-    },
-    3: {
-        true: { cost: 2.5, success: 2/3, destroy: 1/3 },
-        false: { cost: 3.5, success: 2/3, destroy: 1/3 }
-    },
-    4: {
-        true: { cost: 3, success: 1, destroy: 0 },
-        false: { cost: 6.5, success: 1/2, destroy: 0 }
-    }
+    15: { success: 0.3, destroy: 0.03, destroyStar: 12, safeguard: true, modes: {
+        2: { success: 0.3, destroy: 0.02, cost: 1.5 },
+        3: { success: 0.3, destroy: 0.01, cost: 2.5 },
+        4: { success: 0.3, destroy: 0, cost: 3 }
+    }},
+    16: { success: 0.3, destroy: 0.03, destroyStar: 12, safeguard: true, modes: {
+        2: { success: 0.3, destroy: 0.02, cost: 1.5 },
+        3: { success: 0.3, destroy: 0.01, cost: 2.5 },
+        4: { success: 0.3, destroy: 0, cost: 3 }
+    }},
+    17: { success: 0.15, destroy: 0.08, destroyStar: 12, safeguard: true, modes: {
+        2: { success: 0.15, destroy: 0.05, cost: 1.5 },
+        3: { success: 0.15, destroy: 0.02, cost: 2.5 },
+        4: { success: 0.15, destroy: 0, cost: 3 }
+    }},
+    18: { success: 0.15, destroy: 0.08, destroyStar: 12, safeguard: false, modes: {
+        2: { success: 0.12, destroy: 0.05, cost: 2 },
+        3: { success: 0.1, destroy: 0.02, cost: 3.5 },
+        4: { success: 0.08, destroy: 0, cost: 6.5 }
+    }},
+    19: { success: 0.15, destroy: 0.1, destroyStar: 12, safeguard: false, modes: {
+        2: { success: 0.12, destroy: 0.07, cost: 2 },
+        3: { success: 0.1, destroy: 0.04, cost: 3.5 },
+        4: { success: 0.08, destroy: 0, cost: 6.5 }
+    } },
+    20: { success: 0.3, destroy: 0.15, destroyStar: 15, safeguard: false, modes: {
+        2: { success: 0.25, destroy: 0.1, cost: 2 },
+        3: { success: 0.2, destroy: 0.05, cost: 3.5 },
+        4: { success: 0.15, destroy: 0, cost: 6.5 }
+    }},
+    21: { success: 0.15, destroy: 0.15, destroyStar: 17, safeguard: false, modes: {
+        2: { success: 0.12, destroy: 0.1, cost: 2 },
+        3: { success: 0.1, destroy: 0.05, cost: 3.5 },
+        4: { success: 0.08, destroy: 0, cost: 6.5 }
+    }},
+    22: { success: 0.15, destroy: 0.2, destroyStar: 17, safeguard: false, modes: false },
+    23: { success: 0.1, destroy: 0.2, destroyStar: 19, safeguard: false, modes: false },
+    24: { success: 0.1, destroy: 0.2, destroyStar: 19, safeguard: false, modes: false },
+    25: { success: 0.1, destroy: 0.2, destroyStar: 19, safeguard: false, modes: false },
+    26: { success: 0.07, destroy: 0.2, destroyStar: 20, safeguard: false, modes: false },
+    27: { success: 0.05, destroy: 0.2, destroyStar: 20, safeguard: false, modes: false },
+    28: { success: 0.03, destroy: 0.2, destroyStar: 20, safeguard: false, modes: false },
+    29: { success: 0.01, destroy: 0.2, destroyStar: 20, safeguard: false, modes: false }
 };
 
 class Matrix {
@@ -150,6 +159,14 @@ class Matrix {
     }
 }
 
+function getEnhancementMode(args, star) {
+    if (data[star].modes && canDestroy(args, star)) {
+        return data[star].modes[args.modes[star]] ?? null;
+    } else {
+        return null;
+    }
+}
+
 function getPrice(args, star) {
     var level = Math.floor(args.level / 10) * 10;
     var base;
@@ -185,14 +202,23 @@ function getPrice(args, star) {
     if ((args.event & events.discount) > 0) {
         multiplier *= 0.7;
     }
-    if (args.safeguard[star] && data[star].safeguard && canDestroy(args, star)) {
-        multiplier += 2;
+    var mode = getEnhancementMode(args, star);
+    if (mode) {
+        if (data[star].safeguard && mode.destroy <= 0) {
+            multiplier += mode.cost - 1;
+        } else {
+            multiplier *= mode.cost;
+        }
     }
     return base * multiplier;
 }
 
 function getSuccessRate(args, star) {
     var success = data[star].success;
+    var mode = getEnhancementMode(args, star);
+    if (mode) {
+        success = mode.success;
+    }
     if (args.catcher) {
         success *= 1.05;
     }
@@ -203,23 +229,23 @@ function getSuccessRate(args, star) {
 }
 
 function canDestroy(args, star) {
-    var result = data[star].destroy && data[star].destroy > 0;
     if ((args.event & events.guarantee) > 0 && (star == 5 || star == 10 || star == 15)) {
-        result = false;
+        return false;
     }
-    return result;
+    return data[star].destroy && data[star].destroy > 0;
 }
 
 function getDestroyRate(args, star) {
+    if (!canDestroy(args, star)) {
+        return 0;
+    }
     var rate = data[star].destroy;
+    var mode = getEnhancementMode(args, star);
+    if (mode) {
+        rate = mode.destroy;
+    }
     if ((args.event & events.lowerDestroy) > 0 && star < 22) {
         rate *= 0.7;
-    }
-    if (args.safeguard[star] && data[star].safeguard) {
-        rate = 0;
-    }
-    if (!canDestroy(args, star)) {
-        rate = 0;
     }
     return rate;
 }
@@ -261,7 +287,8 @@ function calculateStep(args, star, results) {
     var failureTable = [];
     var remainingRate = 1;
     var entry;
-    if (canDestroy(args, star) && !(args.safeguard[star] && data[star].safeguard)) {
+    var destroyRate = getDestroyRate(args, star);
+    if (canDestroy(args, star) && destroyRate > 0) {
         //scenario: failure is a destroy
         entry = {
             weight: remainingRate * getDestroyRate(args, star),
@@ -322,18 +349,14 @@ function calculate() {
         var from = parseInt(document.getElementById('from').value);
         var to = parseInt(document.getElementById('to').value);
 
-        args.safeguard = {};
+        args.modes = {};
         for (var k = 0; k < 30; k++) {
-            args.safeguard[k] = false;
+            args.modes[k] = 1;
         }
-        if (document.getElementById('safeguard').checked) {
-            var safeguardStars = document.getElementById('safeguard-stars').querySelectorAll('input');
-            for (var k = 0; k < safeguardStars.length; k++) {
-                if (safeguardStars[k].checked) {
-                    var safeguardStar = parseInt(safeguardStars[k].id.split('-')[1]);
-                    args.safeguard[safeguardStar] = true;
-                }
-            }
+        var starModes = document.getElementById('star-modes').querySelectorAll('input');
+        for (var k = 0; k < starModes.length; k++) {
+            var star = parseInt(starModes[k].id.split('-')[0]);
+            args.modes[star] = starModes[k].value;
         }
 
         args.catcher = document.getElementById('catcher').checked;
@@ -543,10 +566,19 @@ function drawDestroyGraph(canvas, firstDistribution, destroyDistribution) {
     }
 }
 
-function toggleSafeguard() {
-    var safeguard = document.getElementById('safeguard').checked;
-    var checkboxes = document.getElementById('safeguard-stars').querySelectorAll('input');
-    for (var k = 0; k < checkboxes.length; k++) {
-        checkboxes[k].disabled = !safeguard;
+function syncModes() {
+    var value = document.getElementById('mode').value;
+    if (value) {
+        var inputs = document.getElementById('star-modes').querySelectorAll('input');
+        for (var k = 0; k < inputs.length; k++) {
+            inputs[k].value = value;
+        }
+    }
+}
+
+function clearOverallMode(input) {
+    var overall = document.getElementById('mode');
+    if (overall.value != input.value) {
+        overall.value = '';
     }
 }

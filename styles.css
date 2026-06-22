@@ -22,8 +22,8 @@ summary {
     cursor: default;
 }
 
-.bold {
-    font-weight: bold;
+.gray {
+    color: #343434;
 }
 
 .section {
