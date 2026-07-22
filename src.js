@@ -17,6 +17,8 @@ const mvp = {
     diamond: 0.9
 };
 
+const spareCostUnit = 1e9;
+
 const data = {
     0: { success: 0.95 },
     1: { success: 0.9 },
@@ -346,6 +348,7 @@ function calculate() {
         args.event = events[document.getElementById('event').value];
         args.mvpDiscount = mvp[document.getElementById('mvp').value];
         args.level = parseInt(document.getElementById('level').value);
+        args.spareCost = parseInt(document.getElementById('spare-cost').value);
         var from = parseInt(document.getElementById('from').value);
         var to = parseInt(document.getElementById('to').value);
 
@@ -368,8 +371,12 @@ function calculate() {
             calculateStep(args, k, results);
         }
         var result = calculateRange(args, from, to, results);
+        var totalCost = result.price;
+        if (args.spareCost > 0 && result.destroys > 0) {
+            totalCost += args.spareCost * result.destroys * spareCostUnit;
+        }
 
-        document.getElementById('cost-average').innerHTML = result.price.toLocaleString();
+        document.getElementById('cost-average').innerHTML = totalCost.toLocaleString();
         document.getElementById('destroy-average').innerHTML = result.destroys;
         resultDiv.hidden = false;
 
