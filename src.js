@@ -221,9 +221,7 @@ function getSuccessRate(args, star) {
     if (mode) {
         success = mode.success;
     }
-    if (args.catcher) {
-        success *= 1.05;
-    }
+    success *= 1.05;
     if ((args.event & events.guarantee) > 0 && (star === 5 || star === 10 || star === 15)) {
         success = 1;
     }
@@ -361,8 +359,6 @@ function calculate() {
             var star = parseInt(starModes[k].id.split('-')[0]);
             args.modes[star] = starModes[k].value;
         }
-
-        args.catcher = document.getElementById('catcher').checked;
 
         // Calculate main results
 
